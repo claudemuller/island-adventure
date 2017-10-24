@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Island Adventure</title>
+    <style>
+        #stage {
+            position: relative;
+            width: 384px;
+            height: 384px;
+            background-image: url('assets/background.png');
+        }
+
+        .cell {
+            display: block;
+            position: absolute;
+            width: 64px;
+            height: 64px;
+        }
+
+        p {
+            width: 400px;
+        }
+    </style>
+</head>
+<body>
+    <div id="stage"></div>
+    <p id="output"></p>
+</body>
+<script src="src/game.js"></script>
+</html>
