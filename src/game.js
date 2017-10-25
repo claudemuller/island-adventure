@@ -13,7 +13,7 @@ const map = [
   ],
   gameObjects = [
     [0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0],
+    [0, 0, 5, 0, 0, 0],
     [0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0],
@@ -24,6 +24,7 @@ const map = [
   PIRATE = 2,
   HOME = 3,
   SHIP = 4,
+  MONSTER = 5,
   SIZE = 64,
   ROWS = map.length,
   COLUMNS = map[0].length,
@@ -33,7 +34,9 @@ const map = [
   LEFT = 37;
 
 let shipRow,
-  shipColumn;
+  shipColumn,
+  monsterRow,
+  monsterColumn;
 
 // Game variables
 let gameMessage = 'Use the arrow keys to find your way home.',
@@ -46,6 +49,11 @@ for (let row = 0; row < ROWS; row++) {
     if (gameObjects[row][column] === SHIP) {
       shipRow = row;
       shipColumn = column;
+    }
+
+    if (gameObjects[row][column] === MONSTER) {
+      monsterRow = row;
+      monsterColumn = column;
     }
   }
 }
@@ -109,6 +117,11 @@ function keydownHandler(event) {
       break;
   }
 
+  moveMonster();
+
+  // Find out if the ship is touching the monster
+  if (gameObjects[shipRow][shipColumn] === MONSTER) endGame();
+
   // Subtract some food each turn
   food--;
 
@@ -116,6 +129,85 @@ function keydownHandler(event) {
   if (food <= 0 || gold <= 0) endGame();
 
   render();
+}
+
+function moveMonster() {
+  // 4 possible directions
+  const UP = 1,
+    DOWN = 2,
+    LEFT = 3,
+    RIGHT = 4;
+
+  // Array to store valid directions that monster can move in
+  const validDirections = [];
+
+  // The final direction that the monster will move in
+  let direction = undefined;
+
+  // Find out what kinds of things are in the cells that surround the monster. If the cell contains
+  // WATER, push the corresponding direction into the validDirections array
+  if (monsterRow > 0) {
+    const thingAbove = map[monsterRow - 1][monsterColumn];
+
+    if (thingAbove === WATER) validDirections.push(UP);
+  }
+
+  if (monsterRow < ROWS - 1) {
+    const thingBelow = map[monsterRow + 1][monsterColumn];
+
+    if (thingBelow === WATER) validDirections.push(DOWN);
+  }
+
+  if (monsterColumn > 0) {
+    const thingToTheLeft = map[monsterRow][monsterColumn - 1];
+
+    if (thingToTheLeft === WATER) validDirections.push(LEFT);
+  }
+
+  if (monsterColumn < COLUMNS - 1) {
+    const thingToTheRight = map[monsterRow][monsterColumn + 1];
+
+    if (thingToTheRight === WATER) validDirections.push(RIGHT);
+  }
+
+  // ValidDirections array now contains 0 to 4 directions that container WATER cells. Which of thoses will
+  // the monster move in
+  // If valid direction was found, randomly choose one of the possible directions and assign to direction var
+  if (validDirections.length !== 0) {
+    const randomNumber = Math.floor(Math.random() * validDirections.length);
+    direction = validDirections[randomNumber];
+  }
+
+  // Move the monster in the chosen random direction
+  switch (direction) {
+    case UP:
+      // Clear the monster's current cell
+      gameObjects[monsterRow][monsterColumn] = WATER;
+
+      // Subtract 1 from the monster's row
+      monsterRow--;
+
+      // Apply the monster's new updated position to array
+      gameObjects[monsterRow][monsterColumn] = MONSTER;
+      break;
+    case DOWN:
+      gameObjects[monsterRow][monsterColumn] = WATER;
+      monsterRow++;
+      gameObjects[monsterRow][monsterColumn] = MONSTER;
+      break;
+    case LEFT:
+      gameObjects[monsterRow][monsterColumn] = WATER;
+      monsterColumn--;
+      gameObjects[monsterRow][monsterColumn] = MONSTER;
+      break;
+    case RIGHT:
+      gameObjects[monsterRow][monsterColumn] = WATER;
+      monsterColumn++;
+      gameObjects[monsterRow][monsterColumn] = MONSTER;
+      break;
+    default:
+      break;
+  }
 }
 
 function fight() {
@@ -177,6 +269,8 @@ function endGame() {
 
     // Display the game message
     gameMessage = `You made it home ALIVE! Final Score: ${score}`;
+  } else if (map[shipRow][shipColumn] === MONSTER) {
+    gameMessage = 'You ship has been swallowed by a sea monster!';
   } else {
     // Display the game message if the player has run out of gold or food
     if (gold <= 0) gameMessage += ` You've run out of gold!`;
@@ -231,6 +325,9 @@ function render() {
       switch (gameObjects[row][column]) {
         case SHIP:
           cell.src = 'assets/ship.png';
+          break;
+        case MONSTER:
+          cell.src = 'assets/monster.png';
           break;
         default:
           break;
