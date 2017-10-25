@@ -33,8 +33,10 @@ const map = [
   LEFT = 37;
 
 let shipRow,
-  shipColumn,
-  gameMessage = 'Use the arrow keys to find your way home.',
+  shipColumn;
+
+// Game variables
+let gameMessage = 'Use the arrow keys to find your way home.',
   food = 10,
   gold = 10,
   experience = 0;
@@ -177,8 +179,8 @@ function endGame() {
     gameMessage = `You made it home ALIVE! Final Score: ${score}`;
   } else {
     // Display the game message if the player has run out of gold or food
-    if (gold <= 0) gameMessage = ` You've run out of gold!`;
-    else ` You've run out of food!`;
+    if (gold <= 0) gameMessage += ` You've run out of gold!`;
+    else gameMessage += ` You've run out of food!`;
 
     gameMessage += ' Your crew throws you overboard!';
   }
