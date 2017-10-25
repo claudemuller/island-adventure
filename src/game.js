@@ -11,15 +11,85 @@ const map = [
     [0, 2, 0, 1, 0, 0],
     [0, 0, 0, 0, 0, 0],
   ],
+  gameObjects = [
+    [0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0],
+    [4, 0, 0, 0, 0, 0],
+  ],
   WATER = 0,
   ISLAND = 1,
   PIRATE = 2,
   HOME = 3,
+  SHIP = 4,
   SIZE = 64,
   ROWS = map.length,
-  COLUMNS = map[0].length;
+  COLUMNS = map[0].length,
+  UP = 38,
+  DOWN = 40,
+  RIGHT = 39,
+  LEFT = 37;
+
+let shipRow,
+  shipColumn;
+
+for (let row = 0; row < ROWS; row++) {
+  for (let column = 0; column < COLUMNS; column++) {
+    if (gameObjects[row][column] === SHIP) {
+      shipRow = row;
+      shipColumn = column;
+    }
+  }
+}
+
+window.addEventListener('keydown', keydownHandler, false);
 
 render();
+
+function keydownHandler(event) {
+  switch (event.keyCode) {
+    case UP:
+      // Find out if ship's move will be within playing field
+      if (shipRow > 0) {
+        // If it is clear the ship's current cell
+        gameObjects[shipRow][shipColumn] = WATER;
+
+        // Subtract 1 from the ship's row to move it up one row
+        shipRow--;
+
+        // Apply the ship's new updated position to array
+        gameObjects[shipRow][shipColumn] = SHIP;
+      }
+      break;
+    case DOWN:
+      if (shipRow < ROWS - 1) {
+        gameObjects[shipRow][shipColumn] = WATER;
+        shipRow++;
+        gameObjects[shipRow][shipColumn] = SHIP;
+      }
+      break;
+    case LEFT:
+      if (shipColumn > 0) {
+        gameObjects[shipRow][shipColumn] = WATER;
+        shipColumn--;
+        gameObjects[shipRow][shipColumn] = SHIP;
+      }
+      break;
+    case RIGHT:
+      if (shipColumn < COLUMNS - 1) {
+        gameObjects[shipRow][shipColumn] = WATER;
+        shipColumn++;
+        gameObjects[shipRow][shipColumn] = SHIP;
+      }
+      break;
+    default:
+      break;
+  }
+
+  render();
+}
 
 function render() {
   // Clear the stage of img tag cells from previous turn
@@ -54,6 +124,15 @@ function render() {
           break;
         case HOME:
           cell.src = 'assets/home.png';
+          break;
+        default:
+          break;
+      }
+
+      // Add the ship from the gameObjects array
+      switch (gameObjects[row][column]) {
+        case SHIP:
+          cell.src = 'assets/ship.png';
           break;
         default:
           break;
