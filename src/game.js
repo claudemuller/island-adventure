@@ -134,7 +134,7 @@ function fight() {
 
     // Update the game message
     gameMessage = `You fight and LOSE ${stolenGold} gold pieces. Ship's strength: ${shipStrength},`
-      + `Pirate's strength: ${pirateStrength}`;
+      + ` Pirate's strength: ${pirateStrength}`;
   } else {
     // The player wins the pirates' gold
     const pirateGold = Math.round(pirateStrength / 2);
@@ -145,7 +145,7 @@ function fight() {
 
     // Update the game message
     gameMessage = `You fight and WIN ${pirateGold} gold pieces. Ship's strength: ${shipStrength},`
-      + `Pirate's stength: ${pirateStrength}`;
+      + ` Pirate's stength: ${pirateStrength}`;
   }
 }
 
@@ -239,4 +239,10 @@ function render() {
       cell.style.left = column * SIZE + 'px';
     }
   }
+
+  // Display the game message
+  output.innerHTML = gameMessage;
+
+  // Display the player's food, gold and experience
+  output.innerHTML += `<br>Gold: ${gold}, Food: ${food}, Experience: ${experience}`;
 }
